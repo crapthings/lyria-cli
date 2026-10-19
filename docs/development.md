@@ -31,17 +31,25 @@ The SDK version is pinned because retry and error behavior are part of this CLI'
 
 ## Release
 
+Log in to npm once with `npm login`, then commit your changes before a real release.
+
 ```sh
-pnpm check
-pnpm test
-npm pack --dry-run
-npm pack
-# Inspect the tarball and verify installation before publishing.
-npm publish --access public
+npm run release -- --dry-run  # Validate the next version without publishing
+npm run release              # Increment patch, publish, commit, tag, and push
+npm run release -- minor     # Increment minor instead
+npm run release -- major     # Increment major instead
+npm run release -- prerelease --preid beta --tag next
 ```
 
-`prepack` rebuilds `dist`. Compiled files, `docs/`, the complete `skills/` directory, the root README, the license, and package metadata are included. Confirm the npm package name is available and that the version is correct before publication; change to a scoped name if needed. The GitHub repository is public; the npm package has not been published yet.
+The default increment is patch: `0.1.0 → 0.1.1 → 0.1.2`. npm's semver rules handle minor, major, and prerelease increments; prereleases use the `next` dist-tag unless overridden with `--tag`. Use `--no-push` to publish and keep the release commit/tag local. `npm run release -- --help` lists all options.
 
+A real release requires a clean Git working tree, a branch (not detached HEAD), a Git identity, and npm authentication. It runs type/comment checks and the full test suite, stages the npm allowlist in a temporary directory, increments that staged version, and verifies the packed CLI and skill files. It publishes that exact tarball publicly, then updates `package.json`, creates a release commit and annotated `vX.Y.Z` tag, and pushes both atomically to `origin`. The pnpm lockfile has no root package version and needs no version-only change.
+
+Dry-run runs checks, builds and packs the incremented candidate, and calls `npm publish --dry-run`. It accepts uncommitted work, skips authentication preflight, and leaves tracked files, Git commits/tags, and the registry unchanged. Ignored build outputs may be refreshed. The real release uses the same staged artifact path with lifecycle scripts disabled because validation already built the output.
+
+On a failed check or confirmed publish rejection, the local version stays unchanged. An interrupted publish response can be ambiguous: check npm before retrying. If npm publication succeeds but Git recording/pushing fails, the command reports that publication already happened; finish the version commit, tag, or push manually rather than incrementing and publishing again. Published versions cannot be reused. No automatic publish retries are added by this script.
+
+The release does not create a GitHub Release entry. Compiled files, `docs/`, the complete `skills/` directory, the root README, the license, and package metadata are included in npm; website sources remain in GitHub.
 
 ## GitHub Pages
 

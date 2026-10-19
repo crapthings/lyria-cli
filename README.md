@@ -39,6 +39,8 @@ pnpm test
 node dist/cli.js --help
 ```
 
+Release a new version with `npm run release` (patch by default). Preview with `npm run release -- --dry-run`.
+
 [CLI reference](docs/cli.md) · [Development, releases & GitHub Pages](docs/development.md)
 
 MIT
