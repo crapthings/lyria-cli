@@ -3,7 +3,7 @@ import { parseArgs } from 'node:util';
 /** Explain release versioning, preview behavior, and Git synchronization. */
 export const releaseHelp = `Usage: npm run release -- [patch|minor|major|prerelease] [options]
 
-Default: bump patch, validate, publish publicly, commit, tag, and push to origin.
+Default: bump patch beyond local/npm versions, validate, publish, commit, tag, and push.
 
   --dry-run       Validate and simulate publishing without changing tracked files or Git
   --preid <id>    Prerelease identifier (default: beta; only with prerelease)

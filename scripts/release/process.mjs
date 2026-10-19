@@ -17,7 +17,7 @@ export function runCommand(command, args, { cwd, capture = false, env = process.
     child.on('error', reject);
     child.on('close', code => {
       if (code === 0) resolve(stdout.trim());
-      else reject(new Error(`${command} ${args[0]} failed (exit ${code}).${capture && stderr ? `\n${stderr.trim()}` : ''}`));
+      else reject(Object.assign(new Error(`${command} ${args[0]} failed (exit ${code}).${capture && stderr ? `\n${stderr.trim()}` : ''}`), { stdout: stdout.trim(), stderr: stderr.trim(), exitCode: code }));
     });
   });
 }

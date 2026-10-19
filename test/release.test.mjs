@@ -6,6 +6,7 @@ import test from 'node:test';
 import { release } from '../scripts/release.mjs';
 import { parseReleaseOptions } from '../scripts/release/options.mjs';
 import { runCommand } from '../scripts/release/process.mjs';
+import { nextReleaseVersion, readPublishedVersions } from '../scripts/release/version.mjs';
 
 /** Create an isolated release fixture with the same required CLI and skill artifact layout. */
 async function withPackage(callback) {
@@ -20,7 +21,7 @@ async function withPackage(callback) {
 }
 
 /** Run real offline versioning and packing while simulating every registry and Git mutation. */
-function simulatedRelease(root, { failure = '', dirty = false, changedHead = false } = {}) {
+function simulatedRelease(root, { failure = '', dirty = false, changedHead = false, published = [], registryError } = {}) {
   const calls = [];
   const messages = [];
   const state = {};
@@ -30,6 +31,10 @@ function simulatedRelease(root, { failure = '', dirty = false, changedHead = fal
     if (command === 'git' && args[0] === 'status') return dirty ? ' M package.json' : '';
     if (command === 'git' && args[0] === 'symbolic-ref') return 'main';
     if (command === 'git' && args[0] === 'rev-parse') return changedHead && headReads++ ? 'new-source' : 'original-source';
+    if (command === 'npm' && args[0] === 'view') {
+      if (registryError) throw registryError;
+      return JSON.stringify(published);
+    }
     if (command === 'npm' && ['version', 'pack'].includes(args[0])) return runCommand(command, args, { ...options, env: { ...process.env, npm_config_cache: join(root, '.npm-cache') } });
     if (command === 'npm' && args[0] === 'publish') {
       state.artifact = JSON.parse(await runCommand('tar', ['-xOf', args[1], 'package/package.json'], { cwd: root, capture: true }));
@@ -139,4 +144,44 @@ test('release arguments reject invalid version and prerelease controls', () => {
   }
   assert.equal(parseReleaseOptions([]).increment, 'patch');
   assert.equal(parseReleaseOptions(['--no-push']).push, false);
+});
+
+// Verify the reported stale-local-version failure selects and records the next unused registry version.
+test('release skips npm versions already published while the local package is behind', async () => {
+  await withPackage(async root => {
+    const simulation = simulatedRelease(root, { published: ['0.1.0', '0.1.1'] });
+    await release([], simulation);
+    assert.equal(simulation.state.artifact.version, '0.1.2');
+    assert.equal(JSON.parse(await readFile(join(root, 'package.json'), 'utf8')).version, '0.1.2');
+    assert.equal(simulation.calls.filter(call => call[1] === 'publish').length, 1);
+    assert.ok(simulation.calls.some(call => call[0] === 'git' && call[1] === 'tag' && call.includes('v0.1.2')));
+  });
+});
+
+// Verify version comparisons use numeric semver precedence and isolate unrelated prerelease channels.
+test('version planning respects numeric ordering, local advances, and prerelease channels', () => {
+  for (const [local, published, increment, preid, expected] of [
+    ['0.1.0', ['0.1.9', '0.1.10'], 'patch', 'beta', '0.1.11'],
+    ['0.5.0', ['0.1.1'], 'patch', 'beta', '0.5.1'],
+    ['0.1.0', ['0.1.1', '2.0.0-beta.0'], 'patch', 'beta', '0.1.2'],
+    ['0.1.0', ['0.1.1'], 'minor', 'beta', '0.2.0'],
+    ['0.1.0', ['0.1.1'], 'major', 'beta', '1.0.0'],
+    ['0.1.0', ['0.1.1', '0.2.0-beta.9', '0.2.0-beta.10', '3.0.0-rc.1'], 'prerelease', 'beta', '0.2.0-beta.11'],
+    ['0.2.0-beta.2', ['0.1.1'], 'patch', 'beta', '0.2.0'],
+  ]) assert.equal(nextReleaseVersion(local, published, { increment, preid }), expected);
+});
+
+// Verify only explicit package absence permits first publication and registry failures stop preparation.
+test('registry errors cannot silently fall back to a potentially published version', async () => {
+  const missing = Object.assign(new Error('Not found'), { stdout: JSON.stringify({ error: { code: 'E404' } }) });
+  assert.deepEqual(await readPublishedVersions('.', 'fixture', async () => { throw missing; }), []);
+  assert.deepEqual(await readPublishedVersions('.', 'fixture', async () => JSON.stringify('0.1.1')), ['0.1.1']);
+  for (const error of [new Error('Network failure'), Object.assign(new Error('Unauthorized'), { stdout: JSON.stringify({ error: { code: 'E401' } }) })]) {
+    await withPackage(async root => {
+      const simulation = simulatedRelease(root, { registryError: error });
+      await assert.rejects(release(['--dry-run'], simulation), /refusing to guess/);
+      assert.ok(!simulation.calls.some(call => call[1] === 'version' || call[1] === 'publish'));
+      assert.equal(JSON.parse(await readFile(join(root, 'package.json'), 'utf8')).version, '0.1.0');
+    });
+  }
 });

@@ -1,5 +1,6 @@
 import { cp, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve, relative, isAbsolute } from 'node:path';
+import { nextReleaseVersion, readPublishedVersions } from './version.mjs';
 
 /** Copy the npm allowlist into an isolated staging directory without local credentials or build tools. */
 async function copyPackageFiles(root, stage, pkg) {
@@ -12,16 +13,17 @@ async function copyPackageFiles(root, stage, pkg) {
   }
 }
 
-/** Prepare the incremented package with npm's own semver rules and pack exactly the staged contents. */
+/** Select an unused registry-aware version and pack exactly the staged package contents. */
 export async function prepareArtifact(root, temporary, options, run) {
   const original = await readFile(join(root, 'package.json'), 'utf8');
   const pkg = JSON.parse(original);
+  const published = await readPublishedVersions(root, pkg.name, run);
+  const nextVersion = nextReleaseVersion(pkg.version, published, options);
   const stage = join(temporary, 'package');
   await mkdir(stage);
   await copyPackageFiles(root, stage, pkg);
   await writeFile(join(stage, 'package.json'), original);
-  const versionArgs = ['version', options.increment, '--no-git-tag-version', '--ignore-scripts', '--package-lock=false'];
-  if (options.increment === 'prerelease') versionArgs.push('--preid', options.preid);
+  const versionArgs = ['version', nextVersion, '--no-git-tag-version', '--ignore-scripts', '--package-lock=false'];
   await run('npm', versionArgs, { cwd: stage, capture: true });
   const updated = await readFile(join(stage, 'package.json'), 'utf8');
   const { version } = JSON.parse(updated);
