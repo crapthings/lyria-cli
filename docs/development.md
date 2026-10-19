@@ -31,7 +31,7 @@ The SDK version is pinned because retry and error behavior are part of this CLI'
 
 ## Release
 
-Log in to npm once with `npm login`, then commit your changes before a real release.
+The public npm package is `@crapthings/lyria-cli`, under the `crapthings` account; the installed executable remains `lyria-cli`. Log in to npm as an account with access to that scope using `npm login`, then commit your changes before a real release. Version lookup uses this scoped package only.
 
 ```sh
 npm run release -- --dry-run  # Validate the next version without publishing
@@ -73,3 +73,9 @@ The GitHub Actions workflow reads the public URL from `actions/configure-pages` 
 To configure hosting, select **Settings → Pages → Build and deployment → Source → GitHub Actions**. The workflow deploys pushes to the default branch, and supports manual dispatch. The repository is [crapthings/lyria-cli](https://github.com/crapthings/lyria-cli), and the site URL is https://crapthings.github.io/lyria-cli/.
 
 The website uses no analytics, remote fonts, or API keys. Copy controls are optional enhancements; installation and usage text remains visible without JavaScript.
+
+The social preview has an editable SVG source. To regenerate its PNG with librsvg installed:
+
+```sh
+rsvg-convert website/assets/social.svg -o website/assets/social.png
+```

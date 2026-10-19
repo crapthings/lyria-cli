@@ -30,7 +30,7 @@ Use the available installation:
 - Global installation: `lyria-cli` on `PATH`.
 - Source checkout: `node dist/cli.js` from the CLI repository root after building.
 
-The skill may be installed separately from the executable. If the CLI is absent, explain that it needs to be installed; do not assume the skill folder contains a built executable. Once the package is published, `npm install lyria-cli` installs the project dependency. Use `--help` to check the installed command's options.
+The skill may be installed separately from the executable. If the CLI is absent, explain that it needs to be installed; do not assume the skill folder contains a built executable. Once the package is published, `npm install @crapthings/lyria-cli` installs the project dependency. Use `--help` to check the installed command's options.
 
 Check that `GEMINI_API_KEY` is nonempty in the invoking environment without printing its value. A variable assigned in `.zshrc` may not be exported or loaded in an agent shell. The CLI does not automatically load `.env` files. Resolve missing credentials before requesting generation; never embed the key in a command argument or prompt.
 

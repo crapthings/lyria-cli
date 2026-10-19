@@ -9,9 +9,9 @@ import { runCommand } from '../scripts/release/process.mjs';
 import { nextReleaseVersion, readPublishedVersions } from '../scripts/release/version.mjs';
 
 /** Create an isolated release fixture with the same required CLI and skill artifact layout. */
-async function withPackage(callback) {
+async function withPackage(callback, { name = 'lyria-release-fixture' } = {}) {
   const root = await mkdtemp(join(tmpdir(), 'lyria-release-test-'));
-  const pkg = { name: 'lyria-release-fixture', version: '0.1.0', files: ['dist', 'skills', 'docs'] };
+  const pkg = { name, version: '0.1.0', files: ['dist', 'skills', 'docs'] };
   await writeFile(join(root, 'package.json'), JSON.stringify(pkg, null, 2) + '\n');
   for (const path of ['dist/cli.js', 'skills/lyria-music/SKILL.md', 'skills/lyria-music/references/prompting.md', 'docs/cli.md', 'README.md', 'LICENSE']) {
     await mkdir(dirname(join(root, path)), { recursive: true });
@@ -184,4 +184,24 @@ test('registry errors cannot silently fall back to a potentially published versi
       assert.equal(JSON.parse(await readFile(join(root, 'package.json'), 'utf8')).version, '0.1.0');
     });
   }
+});
+
+// Verify personal scoped packages keep their CLI name and use only their own registry version history.
+test('scoped release queries and packs the scoped package without renaming the executable', async () => {
+  await withPackage(async root => {
+    const file = join(root, 'package.json');
+    const pkg = JSON.parse(await readFile(file, 'utf8'));
+    pkg.bin = { 'lyria-cli': 'dist/cli.js' };
+    pkg.publishConfig = { access: 'public' };
+    await writeFile(file, JSON.stringify(pkg, null, 2) + '\n');
+    const simulation = simulatedRelease(root);
+    await release(['--dry-run'], simulation);
+    assert.equal(simulation.state.artifact.name, '@crapthings/lyria-cli');
+    assert.equal(simulation.state.artifact.version, '0.1.1');
+    assert.equal(simulation.state.artifact.bin['lyria-cli'], 'dist/cli.js');
+    assert.equal(simulation.state.artifact.publishConfig.access, 'public');
+    assert.equal(simulation.calls.find(call => call[1] === 'view')[2], '@crapthings/lyria-cli');
+    assert.match(simulation.calls.find(call => call[1] === 'publish')[2], /crapthings-lyria-cli-0\.1\.1\.tgz$/);
+    assert.equal(JSON.parse(await readFile(file, 'utf8')).version, '0.1.0');
+  }, { name: '@crapthings/lyria-cli' });
 });

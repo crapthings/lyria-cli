@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>lyria-cli — Generate AI music from your terminal</title>
-  <meta name="description" content="Generate music and songs with Google Lyria from your terminal. Install lyria-cli with npm, create MP3 audio, and give AI agents a ready-to-use music skill.">
+  <meta name="description" content="Generate music and songs with Google Lyria from your terminal. Install @crapthings/lyria-cli with npm, create MP3 audio, and give AI agents a ready-to-use music skill.">
   <meta name="theme-color" content="#f7f8f2">
   <meta property="og:title" content="lyria-cli — Music, from your terminal.">
   <meta property="og:description" content="A simple command line for Google Lyria. Turn text into music, save the MP3, and pass structured results to your agent.">
@@ -51,7 +51,7 @@
       <div class="section-heading"><div><p class="eyebrow">01 / GET STARTED</p><h2 id="quickstart-title">From install to first track.</h2></div><p>Three steps. Your own API key.<br>No account with us required.</p></div>
       <p class="release-note">Pre-release: npm installation commands become available after the first package release.</p>
       <div class="steps">
-        <article class="step"><span class="step-number">01</span><h3>Install the CLI</h3><p>Use npm with Node.js 22 or later.</p><div class="codebox"><pre id="install-command"><code>npm install -g lyria-cli</code></pre><button class="copy" type="button" data-copy="install-command" aria-label="Copy npm installation command" hidden>Copy</button></div></article>
+        <article class="step"><span class="step-number">01</span><h3>Install the CLI</h3><p>Use npm with Node.js 22 or later.</p><div class="codebox"><pre id="install-command"><code>npm install -g @crapthings/lyria-cli</code></pre><button class="copy" type="button" data-copy="install-command" aria-label="Copy npm installation command" hidden>Copy</button></div></article>
         <article class="step"><span class="step-number">02</span><h3>Add your API key</h3><p>Get a key from <a href="https://aistudio.google.com/apikey">Google AI Studio ↗</a>.</p><div class="codebox"><pre id="key-command"><code>export GEMINI_API_KEY='your-key'</code></pre><button class="copy" type="button" data-copy="key-command" aria-label="Copy API key configuration example" hidden>Copy</button></div></article>
         <article class="step"><span class="step-number">03</span><h3>Make something</h3><p>Describe your sound and save an MP3.</p><div class="codebox"><pre id="first-command"><code>lyria-cli generate \
   --prompt 'Dreamy piano, no vocals' \
@@ -79,10 +79,10 @@
       </div>
     </div></section>
     <section class="section wrap" id="agents" aria-labelledby="agents-title">
-      <div class="agent-banner"><div class="agent-copy"><p class="eyebrow">03 / MADE FOR AGENTS, TOO</p><h2 id="agents-title">Give your agent<br>a musical skill.</h2><p>The bundled <code>lyria-music</code> skill covers prompt writing, CLI calls, and result handling. Install the package locally, then add the skill to your agent.</p><a class="text-link" href="./skills/lyria-music/SKILL.md">Read the skill <span aria-hidden="true">↗</span></a></div><div class="agent-install"><p class="tiny-label">INSTALL IN YOUR PROJECT</p><div class="codebox dark-code"><pre id="skill-command"><code>npm install lyria-cli
+      <div class="agent-banner"><div class="agent-copy"><p class="eyebrow">03 / MADE FOR AGENTS, TOO</p><h2 id="agents-title">Give your agent<br>a musical skill.</h2><p>The bundled <code>lyria-music</code> skill covers prompt writing, CLI calls, and result handling. Install the package locally, then add the skill to your agent.</p><a class="text-link" href="./skills/lyria-music/SKILL.md">Read the skill <span aria-hidden="true">↗</span></a></div><div class="agent-install"><p class="tiny-label">INSTALL IN YOUR PROJECT</p><div class="codebox dark-code"><pre id="skill-command"><code>npm install @crapthings/lyria-cli
 
 npx skills add \
-  ./node_modules/lyria-cli/skills/lyria-music</code></pre><button class="copy" type="button" data-copy="skill-command" aria-label="Copy project and skill installation commands" hidden>Copy</button></div><p class="agent-note">The skill travels with the npm package.<br>CLI installation and API credentials are still required.</p></div></div>
+  ./node_modules/@crapthings/lyria-cli/skills/lyria-music</code></pre><button class="copy" type="button" data-copy="skill-command" aria-label="Copy project and skill installation commands" hidden>Copy</button></div><p class="agent-note">The skill travels with the npm package.<br>CLI installation and API credentials are still required.</p></div></div>
       <div class="agent-features"><div><span class="feature-mark" aria-hidden="true">{ }</span><h3>Predictable output</h3><p>JSON on stdout, progress on stderr, and clear exit codes for automation.</p></div><div><span class="feature-mark" aria-hidden="true">↳</span><h3>One request at a time</h3><p>No automatic generation retries. Set a timeout and control the next step yourself.</p></div><div><span class="feature-mark" aria-hidden="true">✓</span><h3>Saved to your workspace</h3><p>Complete MP3 files, saved locally. Existing files are protected by default.</p></div></div>
     </section>
     <section class="faq wrap" aria-labelledby="faq-title"><div><p class="eyebrow">A FEW DETAILS</p><h2 id="faq-title">Before you press enter.</h2></div><div class="faq-items">

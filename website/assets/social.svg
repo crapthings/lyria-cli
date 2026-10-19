@@ -1,0 +1,14 @@
+<!-- Render the project's social preview from editable vector artwork and its current npm installation command. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f7f8f2"/>
+  <g fill="#20261e">
+    <text x="70" y="82" font-family="Menlo,monospace" font-size="32">lyria-cli</text>
+    <text x="70" y="254" font-family="Arial,sans-serif" font-size="90">Music, from</text>
+    <rect x="70" y="355" width="560" height="21" fill="#d9f47b"/>
+    <text x="70" y="354" font-family="Arial,sans-serif" font-size="90">your terminal.</text>
+    <text x="72" y="468" font-family="Arial,sans-serif" font-size="28" fill="#65705f">Google Lyria for you and your agents.</text>
+    <text x="72" y="580" font-family="Menlo,monospace" font-size="22">npm install -g @crapthings/lyria-cli</text>
+  </g>
+  <rect x="780" y="140" width="340" height="345" rx="22" fill="#19231c"/>
+  <path d="M815 295v35m24-50v65m24-87v110m24-132v155m24-120v85m24-140v195m24-217v240m24-205v170m24-135v100m24-125v150m24-110v70m24-55v40" stroke="#d9f47b" stroke-width="9"/>
+</svg>
