@@ -1,0 +1,4 @@
+# These runtime dependencies do not require install scripts for CLI generation.
+allowBuilds:
+  '@google/genai': false
+  protobufjs: false

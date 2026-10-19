@@ -1,0 +1,52 @@
+{
+  "name": "lyria-cli",
+  "version": "0.1.0",
+  "description": "Agent-friendly CLI for generating music with Google Lyria",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "lyria-cli": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "skills",
+    "docs"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "check": "tsc --noEmit && node scripts/check-comments.mjs",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "prepack": "npm run build",
+    "build:site": "node scripts/build-site.mjs"
+  },
+  "dependencies": {
+    "@google/genai": "2.28.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.0"
+  },
+  "keywords": [
+    "lyria",
+    "google-lyria",
+    "gemini-api",
+    "music-generation",
+    "ai-music",
+    "cli",
+    "agent-skills",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crapthings/lyria-cli.git"
+  },
+  "homepage": "https://crapthings.github.io/lyria-cli/",
+  "bugs": {
+    "url": "https://github.com/crapthings/lyria-cli/issues"
+  }
+}
